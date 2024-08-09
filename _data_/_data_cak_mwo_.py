@@ -16,7 +16,7 @@ from paths import datapath_cak
 from _utils_ import plgndr
 
 #--------------------------------------------------------------------------------------------------------------
-def prep_cak_maps(ns, nph, t_start, t_end, bad_ca):
+def prep_cak_maps(ns, nph, t_start, t_end, bad_ca, max_lat):
     """
     Prepare Ca K maps for full dataset.
     """

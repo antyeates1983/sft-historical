@@ -13,6 +13,7 @@ from _shared_ import get_polarities, set_flux, output_region
 import datetime
 import sys
 sys.path.append('../_data_')
+from _data_cak_mwo_ import prep_cak_maps
 from _data_spots_mwo_ import prep_mwo_spots
 from _data_spots_leussu_ import prep_leussu_spots
 
@@ -36,7 +37,7 @@ flux_fit_sd0 = -195.46127042
 bad_ca = []
 
 # Whether to use sunspot data:
-use_spots = False
+use_spots = True
 
 # Path for output data:
 outdir = '/Users/bmjg46/Documents/stfc-historical/regions-full/'
@@ -46,7 +47,7 @@ if __name__ == '__main__':
 
     os.system('mkdir '+outdir)
 
-    for irand in range(n_rlztns):
+    for irand in range(10, 10+n_rlztns):
         if use_spots:
             outpath = outdir+'regions-spots%2.2i/' % irand
         else:
