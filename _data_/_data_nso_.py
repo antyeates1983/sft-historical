@@ -7,7 +7,7 @@ import numpy as np
 import ftplib
 from astropy.io import fits
 from scipy.io import netcdf
-from scipy.interpolate import interp2d
+from scipy.interpolate import RectBivariateSpline
 from _utils_ import plgndr
 from sunpy.coordinates.sun import carrington_rotation_number
 import os
@@ -170,10 +170,10 @@ def readmap(rot, ns, nph, smooth=0, datapath='./'):
         dpl = 2*np.pi/npl
         scl = np.linspace(-1 + 0.5*dsl, 1 - 0.5*dsl, nsl)  
         pcl = np.linspace(0.5*dpl, 2*np.pi - 0.5*dpl, npl)
-        bri = interp2d(pcl, scl, brm_l, kind='cubic', copy=True, bounds_error=False, fill_value=0)
+        bri = RectBivariateSpline(pcl, scl, brm_l.T)
         brm_l = np.zeros((nsm, npm))
         for i in range(nsm):
-            brm_l[i,:] = bri(pcm, scm[i]).flatten()
+            brm_l[i,:] = bri(pcm, scm[i]).T.flatten()
         del(bri)
     if (np.shape(brm_r)!=np.shape(brm)):
         nsr = np.size(brm_r, axis=0)
@@ -182,10 +182,10 @@ def readmap(rot, ns, nph, smooth=0, datapath='./'):
         dpr = 2*np.pi/npr
         scr = np.linspace(-1 + 0.5*dsr, 1 - 0.5*dsr, nsr)  
         pcr = np.linspace(0.5*dpr, 2*np.pi - 0.5*dpr, npr)
-        bri = interp2d(pcr, scr, brm_r, kind='cubic', copy=True, bounds_error=False, fill_value=0)
+        bri = RectBivariateSpline(pcr, scr, brm_r.T)
         brm_r = np.zeros((nsm, npm))
         for i in range(nsm):
-            brm_r[i,:] = bri(pcm, scm[i]).flatten()
+            brm_r[i,:] = bri(pcm, scm[i]).T.flatten()
         del(bri)
         
     # Stitch together:
@@ -250,10 +250,10 @@ def readmap(rot, ns, nph, smooth=0, datapath='./'):
     pc = pc1/3 + 2*np.pi/3  # coordinate on the stitched grid
     
     # Interpolate to the computational grid:
-    bri = interp2d(pcm, scm, brm3, kind='cubic', copy=True, bounds_error=False, fill_value=0)
+    bri = RectBivariateSpline(pcm, scm, brm3.T)
     br = np.zeros((ns, nph))
     for i in range(ns):
-        br[i,:] = bri(pc, sc[i]).flatten()
+        br[i,:] = bri(pc, sc[i]).T.flatten()
                 
     # (4) INTERPOLATE LEFT AND RIGHT MAPS TO COMPUTATIONAL GRID
     # ---------------------------------------------------------

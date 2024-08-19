@@ -6,7 +6,7 @@
 import numpy as np
 from astropy.io import fits
 from scipy.io import netcdf
-from scipy.interpolate import interp2d
+from scipy.interpolate import RectBivariateSpline
 from scipy.ndimage.measurements import label
 from scipy.ndimage import grey_dilation
 import matplotlib.pyplot as plt
@@ -188,10 +188,10 @@ def readmap(rot, ns, nph, smooth=0, datapath='./', weights=False):
     pc = pc1/3 + 2*np.pi/3  # coordinate on the stitched grid
 
     # Interpolate to the computational grid:
-    bri = interp2d(pcm, scm, brm3, kind='cubic', copy=True, bounds_error=False, fill_value=0)
+    bri = RectBivariateSpline(pcm, scm, brm3.T)
     br = np.zeros((ns, nph))
     for i in range(ns):
-       br[i,:] = bri(pc, sc[i]).flatten()
+       br[i,:] = bri(pc, sc[i]).T.flatten()
                
     # (4) INTERPOLATE LEFT AND RIGHT MAPS TO COMPUTATIONAL GRID
     # ---------------------------------------------------------

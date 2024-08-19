@@ -5,7 +5,6 @@
     A Yeates - Aug 2024
 """
 import numpy as np
-import datetime
 from scipy.interpolate import NearestNDInterpolator
 from paths import datapath_leussu_spots
 

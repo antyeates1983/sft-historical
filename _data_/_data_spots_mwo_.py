@@ -17,11 +17,11 @@ def prep_mwo_spots(crs, mwo_lag_window_min, mwo_lag_window_max, mwo_lag_width, m
 
     # Read MWO sunspot data:
     spotfile = datapath_mwo_spots+'mwo-spots.csv'
-    data = np.recfromcsv(spotfile, invalid_raise=False, names=True)
-    date_spt = np.char.decode(data['ut_date'], encoding='utf-8')
-    time_spt = np.char.decode(data['ut_time'], encoding='utf-8')
+    data = np.genfromtxt(spotfile, delimiter=',', dtype=None, invalid_raise=False, names=True)
+    date_spt = data['UT_date']
+    time_spt = data['UT_time']
     lat_spt = np.deg2rad(data['q'])
-    lon_spt = np.deg2rad(data['l'])
+    lon_spt = np.deg2rad(data['L'])
     b_spt = data['flux']*100
     try:
         # - offset all values in longitude (based on comparison to Ca-K):
