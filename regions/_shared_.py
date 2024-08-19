@@ -542,8 +542,8 @@ def output_region(reg, reg_pol_fill, complete, pol_frac, preg, cr, outpath, plot
     fid.write_record(plage.astype(np.float64))
     fid.write_record(np.rad2deg(preg).astype(np.float64))
     fid.write_record(cr.astype(np.int16))
-    fid.write_record(complete)
-    fid.write_record(pol_frac)
+    fid.write_record(complete.astype(np.int8))
+    fid.write_record(pol_frac.astype(np.float64))
     fid.close()
 
     if plot:
