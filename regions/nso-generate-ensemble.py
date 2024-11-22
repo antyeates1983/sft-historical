@@ -3,7 +3,7 @@ Generate ensemble of realizations of magnetic region dataset using sunspot data,
 
 For each ensemble, output individual region files in required format for SFT code, along with image.
 
-ARY 2024-Aug
+ARY 2024-Nov
 """
 import os
 import numpy as np
@@ -40,7 +40,7 @@ bad_ca = []
 use_spots = False
 
 # Path for output data:
-outdir = '/Users/bmjg46/Documents/stfc-historical/regions-nso/'
+outdir = 'regions-nso/'
 
 #--------------------------------------------------------------------------------------------------------------
 if __name__ == '__main__':

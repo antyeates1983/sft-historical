@@ -1,7 +1,7 @@
 """
     Python tools for reading digitised sunspot polarity measurements from MWO.
     
-    A Yeates - Aug 2024
+    A Yeates 2024-Aug
 """
 import numpy as np
 from scipy.io import netcdf

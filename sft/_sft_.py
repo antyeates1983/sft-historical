@@ -1,14 +1,14 @@
 """
     Routine to run single simulation and return output to python.
 
-    A Yeates - Oct 2022
+    A Yeates 2024-Nov
 """
 import numpy as np
 import datetime
 from scipy.io import FortranFile
 import os
 
-def sftrun(id, ns, nph, outpath, t_start, hr_end, br0, eta0, v0, p0, tau, bq, b0=1, dims=1, codepath='./'):
+def sftrun(id, ns, nph, outpath, t_start, hr_end, br0, eta0, v0, p0, tau, bq, b0=1, dims=1, codepath='./', hale_factor=[]):
     """
     Run a single simulation with given parameters.
     Set dims=1 for 1D code.
@@ -35,7 +35,10 @@ def sftrun(id, ns, nph, outpath, t_start, hr_end, br0, eta0, v0, p0, tau, bq, b0
     fid.close()
     # Run simulation:
     if (dims == 1):
-        os.system(codepath+'fortran/sft1d '+outpath+(' %3.3i %i %i %i' % (id, ns, nph, hr_end)))
+        if (hale_factor == []):
+            os.system(codepath+'fortran/sft1d '+outpath+(' %3.3i %i %i %i' % (id, ns, nph, hr_end)))
+        else:
+            os.system(codepath+'fortran/sft1d '+outpath+(' %3.3i %i %i %i %4.2f' % (id, ns, nph, hr_end, hale_factor)))
     else:
         os.system(codepath+'fortran/sft '+outpath+(' %3.3i %i %i %i' % (id, ns, nph, hr_end)))
     # Read data:

@@ -3,7 +3,7 @@
 
     Also plot a magnetic butterfly diagram for the overall optimum run, with filament locations overlaid.
 
-    A Yeates - Aug 2024
+    A Yeates - 2024-Nov
 """
 import os
 import numpy as np
@@ -19,19 +19,17 @@ from _data_spots_leussu_ import prep_leussu_spots
 from _data_filaments_xu_ import get_filament_data
 
 # List of plage data realizations (directories):
-# outpaths = [('/Users/bmjg46/Documents/stfc-historical/regions-full/regions-hale%2.2i/' % i) for i in range(20)]
-# outpaths = [('/Users/bmjg46/Documents/stfc-historical/regions-full/regions-hale%2.2i/' % i) for i in range(10)]
-outpaths = [('/Users/bmjg46/Documents/stfc-historical/regions-full/regions-spots%2.2i/' % i) for i in range(10)]
+# outpaths = [('regions-full/regions-hale%2.2i/' % i) for i in range(20)]
+outpaths = [('regions-full/regions-spots%2.2i/' % i) for i in range(20)]
 
 # Specific optimization run filename:
 # [optim[n]_[m].pkl, where n is #parameters and m is #runs]
 optfile1 = 'optim4_10000.pkl'  
 
 # Filename for plot:
-plotdir = 'full'
+plotdir = 'plots-quenching-paper'
 # plotfile_bfly, plotfile_params = 'opt-bfly-hale20.pdf', 'opt-params-hale20.pdf'
-# plotfile_bfly, plotfile_params = 'opt-bfly-hale10.pdf', 'opt-params-hale10.pdf'
-plotfile_bfly, plotfile_params = 'opt-bfly-spots10.pdf', 'opt-params-spots10.pdf'
+plotfile_bfly, plotfile_params = 'opt-bfly-spots20.pdf', 'opt-params-spots20.pdf'
 
 #--------------------------------------------------------------------------------------------------------------
 def get_sft_optim_ensemble():
@@ -44,6 +42,7 @@ def get_sft_optim_ensemble():
     ts, pfs_nor, pfs_sou, dips, bflys = [], [], [], [], []
     obj_pfs = np.zeros(n_rlztn)
     for k, outpath in enumerate(outpaths):
+        print(outpath)
         # Restore outputs from pickle file:
         picklefile = open(outpath+optfile1,'rb')
         eta0s = pickle.load(picklefile)

@@ -1,7 +1,7 @@
 """
 Set global parameters for region extraction.
 
-ARY 2024-Jul
+ARY 2024-Nov
 """
 import numpy as np
 

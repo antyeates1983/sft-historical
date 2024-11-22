@@ -1,7 +1,7 @@
 """
     Python tools for reading NSO synoptic maps and mapping to (s,phi) grid.
     
-    A Yeates - Oct 2022
+    A Yeates 2024-Nov
 """
 import numpy as np
 import ftplib

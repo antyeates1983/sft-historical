@@ -2,13 +2,13 @@
 
 ![banner-image](./_pics_/banner.jpg)
 
-A.R. Yeates, Durham University, Aug 2024
+A.R. Yeates, Durham University, 2024-Nov
 
 ===================================================
 
 Python code (3.x) and Fortran code for **SFT modelling** driven by magnetic regions from **historical data**.
 
-This code accompanies a paper: [in preparation] Development was supported by STFC grant ST/W00108X/1 (https://gtr.ukri.org/projects?ref=ST%2FW00108X%2F1). Functionality includes:
+This code accompanies a paper: [in preparation] Development was supported by an STFC grant (https://gtr.ukri.org/projects?ref=ST%2FW00108X%2F1). Functionality includes:
 
 1. Generation of a dataset of **magnetic regions** based on Ca K synoptic maps, with [or without] polarities informed by sunspot measurements. Currently data from [Mount Wilson Observatory](https://en.wikipedia.org/wiki/Mount_Wilson_Observatory) are used.
 2. Optimising parameters of a classical **surface flux transport** (SFT) model, using the historical regions for the source term, and polar faculae observations as ground truth to constrain the model.

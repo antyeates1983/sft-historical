@@ -1,7 +1,7 @@
 """
     Python tools for reading digitised Ca-K maps from MWO.
     
-    A Yeates - Aug 2024
+    A Yeates 2024-Nov
 """
 import numpy as np
 from astropy.io import fits

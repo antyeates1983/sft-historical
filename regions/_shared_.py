@@ -1,7 +1,7 @@
 """
 Calibrate and illustrate process of extraction magnetic regions from Ca K maps + sunspot measurements, using observed magnetograms as ground truth.
 
-ARY 2024-Jul
+ARY 2024-Nov
 """
 import os
 import sys

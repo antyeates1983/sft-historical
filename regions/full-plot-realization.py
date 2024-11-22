@@ -1,7 +1,7 @@
 """
 Plot results for magnetic regions. Include butterfly diagrams for a single realization, and plot of fluxes for an ensemble of realizations.
 
-ARY 2024-Aug
+ARY 2024-Nov
 """
 import os
 import sys
@@ -19,10 +19,14 @@ from _data_ssa_mandal_ import prep_mandal_ssa
 from _utils_ import toYearFraction
 
 # Single realization to show in butterfly plots:
-datadir1 = '/Users/bmjg46/Documents/stfc-historical/regions-full/regions-spots09/'
+datadir1 = 'regions-full/regions-spots09/'
 
 # Ensemble of realizations to show in flux plot:
-datadirs = ['/Users/bmjg46/Documents/stfc-historical/regions-full/regions-spots%2.2i/' % j for j in range(10)]
+# datadirs = ['regions-full/regions-spots%2.2i/' % j for j in range(0,20)]
+datadirs = ['regions-full/regions-hale%2.2i/' % j for j in range(0,20)]
+
+# Directory for plot:
+plotdir = './'
 
 #--------------------------------------------------------------------------------------------------------------
 def get_regions(datadir):
@@ -292,7 +296,7 @@ if __name__ == '__main__':
     plot_flux_peryr(gs, all_yrs, flux_peryr_cmp, flux_peryr_icmp, t_ssam, areac_ssam)
 
     plt.tight_layout()
-    plt.savefig('full/regions-bfly.pdf')
+    # plt.savefig(plotdir+'/regions-bfly.pdf')
 
     sd_hale = np.std(hale_percents)
     sd_joy = np.std(joy_percents)

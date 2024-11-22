@@ -2,7 +2,7 @@
     Python routines for reading polar crown filament data from Xu+2021.
     https://ui.adsabs.harvard.edu/abs/2021ApJ...909...86X/abstract
 
-    A Yeates - Aug 2024
+    A Yeates 2024-Aug
 """
 import numpy as np
 import datetime

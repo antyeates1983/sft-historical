@@ -2,7 +2,7 @@
     Python tools for reading sunspot data from Leussu+2017.
     https://ui.adsabs.harvard.edu/abs/2017A%26A...599A.131L/abstract
 
-    A Yeates - Aug 2024
+    A Yeates 2024-Aug
 """
 import numpy as np
 from scipy.interpolate import NearestNDInterpolator

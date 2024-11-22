@@ -1,7 +1,7 @@
 """
 Plot results for ensemble of realizations of magnetic regions, for magnetogram overlap period.
 
-ARY 2024-Aug
+ARY 2024-Nov
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,7 +16,7 @@ from _data_nso_ import prep_cak_br_maps
 from _utils_ import toYearFraction
 
 # Parent directory containing individual realizations:
-datapath = '/Users/bmjg46/Documents/stfc-historical/regions-nso/'
+datapath = 'regions-nso/'
 
 # Manually identified bad maps (to omit from comparison):
 bad_br = [1625,1631,1632,1635,1639,1640,1641,1642,1643,1644,1647,1648,1650,1658,1661,1663,1665,1713]

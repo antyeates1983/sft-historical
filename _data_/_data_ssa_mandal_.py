@@ -4,7 +4,7 @@
     
     https://cdsarc.u-strasbg.fr/viz-bin/cat/J/A+A/640/A78#/browse
     
-    A Yeates - Aug 2024
+    A Yeates 2024-Nov
 """
 import numpy as np
 import datetime

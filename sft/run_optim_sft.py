@@ -1,7 +1,7 @@
 """
     Multiple SFT runs using SFT 1D. For full period.
 
-    A Yeates - Aug 2024
+    A Yeates - 2024-Nov
 """
 import multiprocessing
 from itertools import repeat
@@ -18,10 +18,11 @@ sys.path.append('../_data_/')
 from _utils_ import toYearFraction
 
 # List of plage data realizations (directories):
-outpaths = [('/Users/bmjg46/Documents/stfc-historical/regions-full/regions-hale%2.2i/' % i) for i in range(10)]
+# outpaths = [('regions-full/regions-hale%2.2i/' % i) for i in range(20)] + [('/Users/bmjg46/Documents/stfc-historical/regions-full/regions-spots%2.2i/' % i) for i in range(20)]
+outpaths = [('regions-full/regions-spots%2.2i/' % i) for i in range(10,20)]
 
 # Path to ground-truth polar field data:
-datapath_polar = '/Users/bmjg46/Documents/data/mj-polar-faculae/'
+datapath_polar = 'mj-polar-faculae/'
 
 # Plage data parameters:
 t_start = datetime.datetime(1923, 10, 31, 12)
@@ -38,7 +39,7 @@ v0 = [5e-3, 30e-3]
 p0 = [1,10]
 tau = 0 # [1*365.25*86400, 20*365.25*86400]
 bq = 0    
-b0 = [-10, 0]
+b0 = [-15, 0]
 
 # Set this parameter to True to run the simulation but without regenerating the emerging region files:
 reuse_regions = False

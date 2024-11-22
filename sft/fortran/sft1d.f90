@@ -13,12 +13,14 @@ IMPLICIT NONE
     INTEGER, PARAMETER :: outfreq_hrs = 24
     
     CHARACTER(LEN=200) :: datapath, ns_arg, np_arg, hr_end_arg, procid
+    CHARACTER(LEN=200) :: hale_factor_arg
     CHARACTER(LEN=21), ALLOCATABLE :: filename_regs(:)
     LOGICAL :: quenching_flag
     INTEGER :: i, io, ns, np, hr_end
     INTEGER :: hr, hr_evolve, hr_evolve_reg, hr_evolve_out, hr_last_out
     INTEGER :: k_out, k_regs, nregs, nouts, nsteps
     INTEGER, ALLOCATABLE :: hr_regs(:), hr_out(:)
+    REAL(d) :: hale_factor
     REAL(d) :: ds, dp, np_d
     REAL(d) :: t_evolve, dtmax, dt_mf, dt_eta, dt, dtds
     REAL(d) :: omA, omB, omC, v0, p0, eta0, tau, bq
@@ -37,6 +39,11 @@ IMPLICIT NONE
     READ(ns_arg,*) ns
     READ(np_arg,*) np
     READ(hr_end_arg,*) hr_end
+
+    IF (COMMAND_ARGUMENT_COUNT() > 5) THEN
+        CALL GET_COMMAND_ARGUMENT(6, hale_factor_arg)
+        READ(hale_factor_arg, *) hale_factor
+    END IF
 
     ! Initialization:
     np_d = REAL(np)
@@ -112,7 +119,11 @@ IMPLICIT NONE
         
         ! Insert any regions:
         DO WHILE ((hr == hr_regs(k_regs)).AND.(k_regs <= nregs))
-            CALL add_region(br2, TRIM(datapath)//'regions/'//filename_regs(k_regs))
+            IF (COMMAND_ARGUMENT_COUNT() > 5) THEN
+                CALL add_region(br2, TRIM(datapath)//'regions/'//filename_regs(k_regs), hale_factor)
+            ELSE
+                CALL add_region(br2, TRIM(datapath)//'regions/'//filename_regs(k_regs), 0d0)
+            END IF
             br = br + SUM(br2, DIM=1)/np_d
             k_regs = k_regs + 1
         END DO
@@ -159,13 +170,28 @@ IMPLICIT NONE
 CONTAINS
 
 !==========================================================
-SUBROUTINE add_region(br2, rfile)
+SUBROUTINE add_region(br2, rfile, hale_factor)
     ! Read 2D 'br' array from binary file.
     REAL(d), DIMENSION(:,:), INTENT(INOUT) :: br2
     CHARACTER*(*), INTENT(IN) :: rfile
+    REAL(d), INTENT(IN) :: hale_factor
+    REAL(d), DIMENSION(:,:), ALLOCATABLE :: tmp
+    REAL(d) :: tmp1
+    INTEGER(KIND=2) :: tmp2
+    INTEGER(KIND=1) :: complete
 
     OPEN(1, file=TRIM(rfile), form='unformatted')
     READ(1) br2
+
+    IF (hale_factor > 1d-10) THEN
+        ALLOCATE(tmp, MOLD=br2)
+        READ(1) tmp
+        READ(1) tmp1
+        READ(1) tmp2
+        READ(1) complete
+        IF (complete == 0) br2 = br2 / 1.3d0 * hale_factor
+    END IF
+
     CLOSE(1)
 
 END SUBROUTINE add_region
