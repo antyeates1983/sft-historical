@@ -75,7 +75,7 @@ def prep_cak_maps(ns, nph, t_start, t_end, bad_ca, max_lat):
     return ncar, cr_start, cr_end, nlow, ica, crs, map_cak
 
 #--------------------------------------------------------------------------------------------------------------
-def readmap(rot, ns, nph, smooth=0, datapath='./', weights=False):
+def readmap(rot, ns, nph, smooth=0, datapath='./', weights=False, smoothtype='new'):
     """
         Read Ca-K map for Carrington rotation rot.
         Also reads in the neighbouring maps.
@@ -144,39 +144,86 @@ def readmap(rot, ns, nph, smooth=0, datapath='./', weights=False):
     # (2) SMOOTH COMBINED MAP WITH SPHERICAL HARMONIC FILTER
     # ------------------------------------------------------
     if (smooth > 0):
-       # Azimuthal dependence by FFT:
-       brm3 = np.fft.fft(brm3, axis=1)
+        if smoothtype == 'new':
+            # NEW IMPLEMENTATION: computes discrete eigenfunctions instead of Plm.
+            # Find eigenfunctions of discrete Laplacian:
 
-       # Choose suitable lmax based on smoothing filter coefficient:
-       # -- such that exp[-smooth*lmax*(lmax+1)] < 0.05
-       # -- purpose of this is to make sure high l's are suppressed, to avoid ringing
-       lmax = 0.5*(-1 + np.sqrt(1-4*np.log(0.05)/smooth))
-       print('lmax = %i' % lmax)
+            # Prepare tridiagonal matrix:
+            Fp = sgm * 0  # Lp/Ls on p-ribs
+            Fp[1:-1] = np.sqrt(1 - sgm[1:-1] ** 2) / (np.arcsin(scm[1:]) - np.arcsin(scm[:-1])) * dpm
+            Vg = Fp / dsm / dpm
+            Fs = ((np.arcsin(sgm[1:]) - np.arcsin(sgm[:-1])) / np.sqrt(1 - scm ** 2) / dpm)  # Ls/Lp on s-ribs
+            Uc = Fs / dsm / dpm
+            # - create off-diagonal part of the matrix:
+            A = np.zeros((nsm, nsm))
+            for j in range(nsm- 1):
+                A[j, j + 1] = -Vg[j + 1]
+                A[j + 1, j] = A[j, j + 1]
+            # - term required for m-dependent part of matrix:
+            mu = np.fft.fftfreq(npm)
+            mu = 4 * np.sin(np.pi * mu) ** 2
 
-       # Compute Legendre polynomials on equal (s, ph) grid,
-       # with spherical harmonic normalisation:
-       lmax = 2*int((nph-1)/2)  # note - already lower resolution
-       nm = 2*lmax+1  # only need to compute this many values
-       plm = np.zeros((nsm, nm, lmax+1))
-       for m in range(lmax+1):
-           plm[:,m,:] = plgndr(m, scm, lmax)
-       plm[:,nm-1:(nm-lmax-1):-1,:] = plm[:,1:lmax+1,:]
-       
-       # Compute spherical harmonic coefficients:
-       blm = np.zeros((nm,lmax+1), dtype='complex')
-       for l in range(lmax+1):
-           blm[:lmax+1,l] = np.sum(plm[:,:lmax+1,l]*brm3[:,:lmax+1]*dsm, axis=0)
-           blm[lmax+1:,l] = np.sum(plm[:,lmax+1:,l]*brm3[:,-lmax:]*dsm, axis=0)
-           # Apply smoothing filter:
-           blm[:,l] *= np.exp(-smooth*l*(l+1))
+            # FFT in phi of photospheric distribution at each latitude:
+            brhat = np.fft.rfft(brm3, axis=1)
 
-       # Invert transform:
-       brm3[:,:] = 0.0
-       for j in range(nsm):
-           brm3[j,:lmax+1] = np.sum(blm[:lmax+1,:]*plm[j,:lmax+1,:], axis=1)
-           brm3[j,-lmax:] = np.sum(blm[lmax+1:,:]*plm[j,lmax+1:,:], axis=1)
+            # Loop over azimuthal modes (positive m):
+            nm = npm//2 + 1
+            blm = np.zeros((nsm, nm), dtype="complex")
+            brhat1 = np.zeros((nsm, nm), dtype="complex")
+            for m in range(nm):
+                # - set diagonal terms of matrix:
+                for j in range(nsm):
+                    A[j, j] = Vg[j] + Vg[j + 1] + Uc[j] * mu[m]
+                # - compute eigenvectors Q_{lm} and eigenvalues lam_{lm}:
+                #   (note that A is symmetric so use special solver)
+                lam, Q = la.eigh(A)
+                # - find coefficients of eigenfunction expansion:
+                for l in range(nsm):
+                    blm[l,m] = np.dot(Q[:,l], brhat[:,m])
+                    # - apply filter [the eigenvalues should be a numerical approx of lam = l*(l+1)]:
+                    blm[l,m] *= np.exp(-smooth*lam[l])
+                # - invert the latitudinal transform:
+                brhat1[:,m] = np.dot(blm[:,m], Q.T)
 
-       brm3 = np.real(np.fft.ifft(brm3, axis=1))
+            # Invert the FFT in longitude:
+            brm3 = np.real(np.fft.irfft(brhat1, axis=1))
+
+        else:
+            # ORIGINAL IMPLEMENTATION: computing Plm using recurrence - suggest not to use since it is inaccurate for (moderately) large l.
+
+            # Azimuthal dependence by FFT:
+            brm3 = np.fft.fft(brm3, axis=1)
+
+            # Choose suitable lmax based on smoothing filter coefficient:
+            # -- such that exp[-smooth*lmax*(lmax+1)] < 0.05
+            # -- purpose of this is to make sure high l's are suppressed, to avoid ringing
+            lmax = 0.5*(-1 + np.sqrt(1-4*np.log(0.05)/smooth))
+            print('lmax = %i' % lmax)
+
+            # Compute Legendre polynomials on equal (s, ph) grid,
+            # with spherical harmonic normalisation:
+            lmax = 2*int((nph-1)/2)  # note - already lower resolution
+            nm = 2*lmax+1  # only need to compute this many values
+            plm = np.zeros((nsm, nm, lmax+1))
+            for m in range(lmax+1):
+                plm[:,m,:] = preptools.plgndr(m, scm, lmax)        
+            plm[:,nm-1:(nm-lmax-1):-1,:] = plm[:,1:lmax+1,:]
+            
+            # Compute spherical harmonic coefficients:
+            blm = np.zeros((nm,lmax+1), dtype='complex')
+            for l in range(lmax+1):
+                blm[:lmax+1,l] = np.sum(plm[:,:lmax+1,l]*brm3[:,:lmax+1]*dsm, axis=0)
+                blm[lmax+1:,l] = np.sum(plm[:,lmax+1:,l]*brm3[:,-lmax:]*dsm, axis=0)
+                # Apply smoothing filter:
+                blm[:,l] *= np.exp(-smooth*l*(l+1))
+
+            # Invert transform:
+            brm3[:,:] = 0.0
+            for j in range(nsm):
+                brm3[j,:lmax+1] = np.sum(blm[:lmax+1,:]*plm[j,:lmax+1,:], axis=1)
+                brm3[j,-lmax:] = np.sum(blm[lmax+1:,:]*plm[j,lmax+1:,:], axis=1)
+
+            brm3 = np.real(np.fft.ifft(brm3, axis=1))       
                               
     # (3) INTERPOLATE CENTRAL MAP TO COMPUTATIONAL GRID
     # -------------------------------------------------
