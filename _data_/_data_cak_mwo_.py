@@ -9,6 +9,7 @@ from scipy.io import netcdf
 from scipy.interpolate import RectBivariateSpline
 from scipy.ndimage.measurements import label
 from scipy.ndimage import grey_dilation
+import scipy.linalg as la
 import matplotlib.pyplot as plt
 import os
 from sunpy.coordinates.sun import carrington_rotation_number
@@ -140,7 +141,8 @@ def readmap(rot, ns, nph, smooth=0, datapath='./', weights=False, smoothtype='ne
     dpm = 2*np.pi/npm
     scm = np.linspace(-1 + 0.5*dsm, 1 - 0.5*dsm, nsm)
     pcm = np.linspace(0.5*dpm, 2*np.pi - 0.5*dpm, npm)
-    
+    sgm = np.linspace(-1, 1, nsm+1) 
+
     # (2) SMOOTH COMBINED MAP WITH SPHERICAL HARMONIC FILTER
     # ------------------------------------------------------
     if (smooth > 0):

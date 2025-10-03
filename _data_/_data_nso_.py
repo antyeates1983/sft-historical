@@ -8,6 +8,7 @@ import ftplib
 from astropy.io import fits
 from scipy.io import netcdf
 from scipy.interpolate import RectBivariateSpline
+import scipy.linalg as la
 from _utils_ import plgndr
 from sunpy.coordinates.sun import carrington_rotation_number
 import os
@@ -202,6 +203,7 @@ def readmap(rot, ns, nph, smooth=0, datapath='./', smoothtype='new'):
     dpm = 2*np.pi/npm
     scm = np.linspace(-1 + 0.5*dsm, 1 - 0.5*dsm, nsm)  
     pcm = np.linspace(0.5*dpm, 2*np.pi - 0.5*dpm, npm)  
+    sgm = np.linspace(-1, 1, nsm+1) 
 
     # (2) SMOOTH COMBINED MAP WITH SPHERICAL HARMONIC FILTER
     # ------------------------------------------------------
